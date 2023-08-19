@@ -1,24 +1,31 @@
-
 import type { V2_MetaFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-
 import { useOptionalUser } from "~/utils";
 
 import { Nav, Card, Profile } from "~/components";
 
 export const meta: V2_MetaFunction = () => [{ title: "Remix Notes" }];
 
-// export async function loader({ request }:LoaderArgs) {
-//   const response = await fetch('https://example.com/people');
-//   const data = await response.json() as Array<{ name: string }>;
+type Task = {
+  id: number;
+  title: string;
+  description: string;
+  label: string;
+  status: string;
+  dueDate: string;
+};
 
-//   return json(data)
-// }
+export async function loader({ request }: LoaderArgs) {
+  const response = await fetch("https://example.com/tasks");
+  const data = (await response.json()) as { tasks: Array<Task> };
+
+  return json(data);
+}
 
 export default function Index() {
   const user = useOptionalUser();
-  // const people = useLoaderData<typeof loader>();
+  const { tasks } = useLoaderData<typeof loader>();
 
   return (
     <div className="App">
@@ -165,11 +172,16 @@ export default function Index() {
               <div className={"w-80 flex-shrink-0 rounded bg-gray-100 p-3"}>
                 <h3 className={"text-sm font-medium text-gray-900"}>To Do</h3>
                 <ul className={"mt-2"}>
-                  <Card
-                    title="Add discount code to checkout page"
-                    startDate="Sep 14"
-                    label="Feature Request"
-                  />
+                  {tasks
+                    .filter((task) => task.status === "To Do")
+                    .map(({ id, title, dueDate, label }) => (
+                      <Card
+                        key={id}
+                        title={title}
+                        dueDate="Sep 14"
+                        label={label}
+                      />
+                    ))}
                 </ul>
               </div>
 
@@ -180,11 +192,16 @@ export default function Index() {
                   In Progress
                 </h3>
                 <ul className={"mt-2"}>
-                  <Card
-                    title="Add discount code to checkout page"
-                    startDate="Sep 14"
-                    label="Feature Request"
-                  />
+                  {tasks
+                    .filter((task) => task.status === "In Progress")
+                    .map(({ id, title, dueDate, label }) => (
+                      <Card
+                        key={id}
+                        title={title}
+                        dueDate="Sep 14"
+                        label={label}
+                      />
+                    ))}
                 </ul>
               </div>
 
@@ -195,11 +212,16 @@ export default function Index() {
                   In Review
                 </h3>
                 <ul className={"mt-2"}>
-                  <Card
-                    title="Add discount code to checkout page"
-                    startDate="Sep 14"
-                    label="Feature Request"
-                  />
+                  {tasks
+                    .filter((task) => task.status === "Review")
+                    .map(({ id, title, dueDate, label }) => (
+                      <Card
+                        key={id}
+                        title={title}
+                        dueDate="Sep 14"
+                        label={label}
+                      />
+                    ))}
                 </ul>
               </div>
 
@@ -208,11 +230,16 @@ export default function Index() {
               >
                 <h3 className={"text-sm font-medium text-gray-900"}>Done</h3>
                 <ul className={"mt-2"}>
-                  <Card
-                    title="Add discount code to checkout page"
-                    startDate="Sep 14"
-                    label="Feature Request"
-                  />
+                  {tasks
+                    .filter((task) => task.status === "Done")
+                    .map(({ id, title, dueDate, label }) => (
+                      <Card
+                        key={id}
+                        title={title}
+                        dueDate="Sep 14"
+                        label={label}
+                      />
+                    ))}
                 </ul>
               </div>
             </main>
